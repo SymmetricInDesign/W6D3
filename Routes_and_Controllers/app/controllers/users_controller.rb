@@ -1,15 +1,10 @@
 
 class UsersController < ApplicationController
-
+    def user_params(params)
+        params.require(:user).permit(:username)
+    end
     def create
-        # user = User.create!(params.require(:user).permit(:email, :name))
-        # str = "12ajsdlfjasdflk"
-        # replace the `user_attributes_here` with the actual attribute keys
-        # redirect_to '/users'
-        # redirect_to action: 'index', user: str
-        # self.index
-        
-          user = User.new(params.require(:user).permit(:name, :email))
+        user = User.new(user_params(params))
         if user.save
             render json: user
         else
@@ -19,11 +14,16 @@ class UsersController < ApplicationController
 
     def update
         u = User.find(params[:id])
-        u.update(name: params[:name], email: params[:email])
+   
+        if !u.update(user_params(params))
+            render json: u.errors.full_messages, status: :unprocessable_entity
+        else
+        redirect_to ("/users")
+        end
     end
     def destroy
         u = User.find(params[:id])
-        u.delete
+        render json: u.destroy
     end
     def edit
         
